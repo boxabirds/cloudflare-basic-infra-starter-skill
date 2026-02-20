@@ -1,0 +1,180 @@
+#!/bin/bash
+# Deploy script skeleton for Cloudflare Workers
+# Replace MY_WORKER, MY_APP, example.com with your values.
+set -euo pipefail
+
+# ============================================
+# Configuration
+# ============================================
+
+ENVIRONMENT="${1:-staging}"  # "staging" or "production"
+WORKER_DIR="workers/MY_WORKER"
+DEPLOY_LOG="docs/ops/deployment-log.csv"
+
+case "$ENVIRONMENT" in
+  staging)
+    BASE_URL="https://staging-api.example.com"
+    MIGRATION_SAFETY="warn"
+    ;;
+  production)
+    BASE_URL="https://api.example.com"
+    MIGRATION_SAFETY="block"
+    # Production must be interactive
+    if [ ! -t 0 ]; then
+      echo "ERROR: Production deploys must be run from a terminal."
+      exit 1
+    fi
+    ;;
+  *)
+    echo "Usage: $0 [staging|production]"
+    exit 1
+    ;;
+esac
+
+# ============================================
+# Helpers
+# ============================================
+
+retry_command() {
+  local max_attempts="$1"
+  local delay="$2"
+  shift 2
+  local cmd=("$@")
+  local attempt=1
+
+  while [ $attempt -le $max_attempts ]; do
+    if "${cmd[@]}"; then
+      return 0
+    fi
+    echo "Attempt $attempt/$max_attempts failed. Retrying in ${delay}s..."
+    sleep "$delay"
+    delay=$((delay * 2))
+    attempt=$((attempt + 1))
+  done
+
+  echo "All $max_attempts attempts failed."
+  return 1
+}
+
+get_deployed_sha() {
+  curl -s --max-time 10 "$BASE_URL/health" | jq -r '.git_sha_full // empty' 2>/dev/null || true
+}
+
+# ============================================
+# Pre-checks
+# ============================================
+
+echo "Deploying to $ENVIRONMENT..."
+
+# Check for uncommitted changes
+if [ -n "$(git status --porcelain)" ]; then
+  echo "ERROR: Uncommitted changes detected. Commit or stash before deploying."
+  exit 1
+fi
+
+GIT_SHA=$(git rev-parse HEAD)
+GIT_SHA_SHORT=$(git rev-parse --short HEAD)
+VERSION=$(jq -r '.version' package.json)
+
+# Idempotency check
+DEPLOYED_SHA=$(get_deployed_sha)
+if [ "$DEPLOYED_SHA" = "$GIT_SHA" ]; then
+  echo "Already deployed: $GIT_SHA_SHORT. Skipping."
+  exit 0
+fi
+
+# ============================================
+# Migration safety scan
+# ============================================
+
+echo "Scanning pending migrations..."
+
+DANGEROUS_PATTERNS=(
+  "CHECK ("
+  "DROP TABLE"
+  "TRUNCATE TABLE"
+  "ALTER TABLE.*MODIFY"
+  "ALTER TABLE.*CHANGE"
+  "ADD CONSTRAINT"
+  "DROP CONSTRAINT"
+)
+
+FOUND_DANGER=false
+for migration in "$WORKER_DIR"/migrations/*.sql; do
+  [ -f "$migration" ] || continue
+  for pattern in "${DANGEROUS_PATTERNS[@]}"; do
+    if grep -qiE "$pattern" "$migration"; then
+      echo "WARNING: $(basename "$migration") contains: $pattern"
+      FOUND_DANGER=true
+    fi
+  done
+done
+
+if [ "$FOUND_DANGER" = true ]; then
+  if [ "$MIGRATION_SAFETY" = "block" ]; then
+    echo "BLOCKED: Dangerous migration patterns found."
+    exit 1
+  else
+    read -rp "Continue with dangerous migrations? [y/N] " confirm
+    if [ "$confirm" != "y" ]; then
+      exit 1
+    fi
+  fi
+fi
+
+# ============================================
+# Apply migrations
+# ============================================
+
+echo "Applying migrations..."
+cd "$WORKER_DIR"
+wrangler d1 migrations apply DB --env "$ENVIRONMENT" --remote
+cd ../..
+
+# ============================================
+# Deploy worker
+# ============================================
+
+echo "Deploying worker..."
+cd "$WORKER_DIR"
+retry_command 3 5 wrangler deploy --env "$ENVIRONMENT"
+cd ../..
+
+# ============================================
+# Health verification
+# ============================================
+
+echo "Verifying deployment..."
+MAX_WAIT=30
+ELAPSED=0
+
+while [ $ELAPSED -lt $MAX_WAIT ]; do
+  DEPLOYED_VERSION=$(curl -s "$BASE_URL/health" | jq -r '.version // empty' 2>/dev/null || true)
+  if [ "$DEPLOYED_VERSION" = "$VERSION" ]; then
+    echo "Verified: v$VERSION deployed successfully."
+    break
+  fi
+  sleep 2
+  ELAPSED=$((ELAPSED + 2))
+done
+
+if [ $ELAPSED -ge $MAX_WAIT ]; then
+  echo "WARNING: Health check timed out. Expected v$VERSION."
+fi
+
+# ============================================
+# Record deployment
+# ============================================
+
+DEPLOY_TAG="deploy/$ENVIRONMENT/$(date +%Y%m%d-%H%M%S)"
+git tag "$DEPLOY_TAG"
+git push origin "$DEPLOY_TAG"
+
+# Append to deploy log
+if [ ! -f "$DEPLOY_LOG" ]; then
+  mkdir -p "$(dirname "$DEPLOY_LOG")"
+  echo "deploy_tag,operator,git_sha,timestamp,status,version" > "$DEPLOY_LOG"
+fi
+echo "$DEPLOY_TAG,$(whoami),$GIT_SHA_SHORT,$(date -u +%Y-%m-%dT%H:%M:%SZ),success,v$VERSION" >> "$DEPLOY_LOG"
+
+echo "Done. Tagged: $DEPLOY_TAG"

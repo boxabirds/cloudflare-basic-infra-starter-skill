@@ -1,0 +1,92 @@
+# Cloudflare Worker Configuration
+# Replace MY_WORKER, MY_APP, example.com with your values.
+# After creating D1 databases and KV namespaces, fill in the IDs.
+
+name = "MY_WORKER"
+main = "dist/index.js"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+[build]
+command = "node build.js"
+watch_dir = "src"
+
+# ============================================
+# Local Development (base config)
+# ============================================
+
+[[d1_databases]]
+binding = "DB"
+database_name = "MY_APP-local"
+database_id = "local"
+
+[[kv_namespaces]]
+binding = "SESSION_KV"
+id = "local-session-kv"
+
+[vars]
+ENVIRONMENT = "local"
+BASE_URL = "http://localhost:8787"
+
+# ============================================
+# Production Environment
+# ============================================
+
+[env.production]
+name = "MY_WORKER-prod"
+logpush = true
+
+[env.production.observability]
+enabled = true
+
+[env.production.observability.logs]
+enabled = true
+invocation_logs = true
+
+[env.production.vars]
+ENVIRONMENT = "production"
+BASE_URL = "https://api.example.com"
+WEB_APP_URL = "https://app.example.com"
+# Secrets: wrangler secret put <NAME> --env production
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "MY_APP-prod"
+database_id = "REPLACE_WITH_PROD_D1_ID"
+
+[[env.production.kv_namespaces]]
+binding = "SESSION_KV"
+id = "REPLACE_WITH_PROD_KV_ID"
+
+[[env.production.routes]]
+pattern = "api.example.com/*"
+zone_name = "example.com"
+
+# ============================================
+# Staging Environment
+# ============================================
+
+[env.staging]
+name = "MY_WORKER-staging"
+logpush = true
+
+[env.staging.observability]
+enabled = true
+
+[env.staging.observability.logs]
+enabled = true
+invocation_logs = true
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
+BASE_URL = "https://staging-api.example.com"
+WEB_APP_URL = "https://staging-app.example.com"
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "MY_APP-staging"
+database_id = "REPLACE_WITH_STAGING_D1_ID"
+
+[[env.staging.kv_namespaces]]
+binding = "SESSION_KV"
+id = "REPLACE_WITH_STAGING_KV_ID"
