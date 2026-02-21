@@ -15,7 +15,7 @@
 set -euo pipefail
 
 SKILL_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-SKILL_NAME="cloudflare-basic-infra-starter-skill"
+SKILL_NAME="cf-starter"
 
 if [ $# -lt 1 ]; then
   echo "Usage: $0 <project-path> [agent...]"
@@ -80,3 +80,6 @@ done
 
 echo ""
 echo "Done. Restart your coding agent to pick up the skill."
+echo ""
+echo "In Claude Code, type /cf-starter to load Cloudflare patterns."
+echo "Or just mention Cloudflare Workers/D1/Wrangler -- Claude will auto-activate."

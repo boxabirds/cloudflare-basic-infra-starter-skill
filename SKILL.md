@@ -1,15 +1,16 @@
 ---
-name: cloudflare-basic-infra-starter-skill
+name: cf-starter
 description: >
-  Infrastructure patterns for small projects on Cloudflare Workers + D1 + Pages.
-  Covers worker architecture (Env bindings, request routing, middleware), D1 database
-  patterns (schema design, migrations, soft delete), multi-environment Wrangler config,
-  deployment scripts with migration safety checks, testing against local workers,
-  Pages frontend deployment, auth middleware, and security headers.
-  Use when building, scaffolding, or reviewing a Cloudflare Workers project.
+  USE WHEN building or scaffolding a Cloudflare Workers project.
+  USE WHEN creating D1 database schemas or writing migrations.
+  USE WHEN setting up wrangler.toml, deployment scripts, or testing infrastructure.
+  USE WHEN deploying to Cloudflare Pages or configuring multi-environment Workers.
+  Patterns: worker architecture, D1 schema design, Wrangler multi-env config,
+  deploy scripts with safety checks, Miniflare local dev, Pages frontend,
+  auth middleware, security headers.
 metadata:
   author: julian
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Cloudflare Workers Infrastructure Patterns
@@ -97,6 +98,20 @@ See [references/pages-frontend.md](references/pages-frontend.md) for build and d
 - **Request ID**: Generate per-request, propagate in response header for tracing
 
 See [references/auth-and-security.md](references/auth-and-security.md) for implementation patterns.
+
+## Local Development
+
+Get from zero to running locally without touching staging or production:
+
+1. Copy `assets/wrangler.toml.template`, fill in your project name
+2. Write your initial migration in `migrations/0001_initial_schema.sql`
+3. Apply locally: `wrangler d1 migrations apply DB --local`
+4. Start worker: `wrangler dev` (Miniflare on port 8787, local SQLite)
+5. Start frontend: Vite dev server proxying API calls to localhost:8787
+6. Verify: `curl http://localhost:8787/health`
+7. Run tests: unit tests with vitest pool workers, E2E against localhost
+
+See [references/local-development.md](references/local-development.md) for the complete walkthrough.
 
 ## Health and Operations
 

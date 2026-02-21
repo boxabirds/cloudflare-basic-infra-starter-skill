@@ -15,6 +15,7 @@ Extracted from a production Cloudflare project. All patterns are generalized -- 
 | [Testing Workers](references/testing-workers.md) | Local dev with Miniflare, test endpoint gating, `@cloudflare/vitest-pool-workers`, E2E setup |
 | [Pages Frontend](references/pages-frontend.md) | Vite SPA build, `VITE_*` env vars, branch-based deploys, SPA routing, Vite proxy for local dev |
 | [Auth and Security](references/auth-and-security.md) | API key hash auth, session cookie fallback, security headers, CORS, request validation |
+| [Local Development](references/local-development.md) | Zero-to-running walkthrough, Miniflare local SQLite, Vite proxy, database reset, test setup |
 | [Health and Ops](references/health-and-ops.md) | Health endpoint, version injection, deployment CSV log, environment status checks, observability config |
 
 Starter templates in [`assets/`](assets/): a `wrangler.toml.template` and `deploy.sh.template` ready to copy and customize.
@@ -25,17 +26,17 @@ Starter templates in [`assets/`](assets/): a `wrangler.toml.template` and `deplo
 
 ```bash
 git clone git@github.com:boxabirds/cloudflare-basic-infra-starter-skill.git \
-  .claude/skills/cloudflare-basic-infra-starter-skill
+  .claude/skills/cf-starter
 ```
 
 ### Other Agents
 
 | Agent | Install path |
 |-------|-------------|
-| Amp | `.agents/skills/cloudflare-basic-infra-starter-skill` |
-| Copilot | `.github/skills/cloudflare-basic-infra-starter-skill` |
-| Cursor | `.cursor/skills/cloudflare-basic-infra-starter-skill` |
-| Codex | `skills/cloudflare-basic-infra-starter-skill` |
+| Amp | `.agents/skills/cf-starter` |
+| Copilot | `.github/skills/cf-starter` |
+| Cursor | `.cursor/skills/cf-starter` |
+| Codex | `skills/cf-starter` |
 
 Or use the install script to auto-detect and symlink:
 
@@ -46,6 +47,23 @@ Or use the install script to auto-detect and symlink:
 ```
 
 Windsurf and Cline don't support skills. Copy the SKILL.md content into `.windsurfrules` or `.clinerules/cloudflare.md` instead.
+
+## After Installation
+
+The skill appears in Claude Code's `/` menu as **`/cf-starter`**.
+
+**Explicit invocation**: Type `/cf-starter` to load all Cloudflare patterns into context.
+
+**Auto-activation**: Claude will attempt to load the skill automatically when you discuss Cloudflare Workers, D1, Wrangler, or Pages. Auto-activation is not 100% reliable -- if Claude doesn't pick it up, type `/cf-starter` explicitly.
+
+**Verify installation**: Ask Claude "What skills are available?" or check the `/` menu.
+
+Example prompts that should trigger the skill:
+- "Set up a new Cloudflare Worker with D1"
+- "Create a deployment script for my worker"
+- "How should I structure my wrangler.toml for staging and prod?"
+- "Add a D1 database with soft delete to my worker"
+- "Help me get local dev running with Miniflare"
 
 ## How It Works
 
