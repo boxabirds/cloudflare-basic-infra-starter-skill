@@ -22,31 +22,42 @@ Starter templates in [`assets/`](assets/): a `wrangler.toml.template` and `deplo
 
 ## Install
 
-### Claude Code
+Most agents scan `.agents/skills/` — clone there for the broadest coverage:
 
 ```bash
 git clone git@github.com:boxabirds/cloudflare-basic-infra-starter-skill.git \
-  .claude/skills/cf-starter
+  .agents/skills/cf-starter
 ```
 
-### Other Agents
+### Agent-specific paths
 
-| Agent | Install path |
-|-------|-------------|
-| Amp | `.agents/skills/cf-starter` |
-| Copilot | `.github/skills/cf-starter` |
-| Cursor | `.cursor/skills/cf-starter` |
-| Codex | `skills/cf-starter` |
+| Agent | Skills path | Notes |
+|-------|-------------|-------|
+| Codex, Amp, Cline, Roo Code | `.agents/skills/cf-starter` | Universal path |
+| Cursor | `.cursor/skills/cf-starter` | Also scans `.agents/skills/` |
+| GitHub Copilot | `.github/skills/cf-starter` | Also scans `.agents/skills/` |
+| Claude Code | `.claude/skills/cf-starter` | Requires its own path |
+| Windsurf | `.windsurf/skills/cf-starter` | Requires its own path |
+| Gemini CLI | `.gemini/skills/cf-starter` | Also scans `.agents/skills/` |
 
-Or use the install script to auto-detect and symlink:
+### Install script (multi-agent symlink)
+
+Symlinks the skill into one or more agent paths at once:
 
 ```bash
-./scripts/install.sh /path/to/your/project          # auto-detect agents
-./scripts/install.sh /path/to/your/project claude    # specific agent
-./scripts/install.sh /path/to/your/project claude amp cursor  # multiple
+./scripts/install.sh /path/to/your/project                        # auto-detect agents
+./scripts/install.sh /path/to/your/project claude                  # specific agent
+./scripts/install.sh /path/to/your/project claude amp windsurf     # multiple
 ```
 
-Windsurf and Cline don't support skills. Copy the SKILL.md content into `.windsurfrules` or `.clinerules/cloudflare.md` instead.
+Supported agents: `claude`, `amp`, `copilot`, `cursor`, `codex`, `windsurf`, `gemini`, `cline`, `roo`.
+
+### Registries
+
+The skill can also be discovered through these directories:
+
+- **[skills.sh](https://skills.sh)** — `npx skills add boxabirds/cloudflare-basic-infra-starter-skill`
+- **[skild.sh](https://skild.sh)** — `skild install boxabirds/cloudflare-basic-infra-starter-skill`
 
 ## After Installation
 
