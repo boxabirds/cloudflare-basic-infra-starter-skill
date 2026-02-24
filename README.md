@@ -22,6 +22,17 @@ Starter templates in [`assets/`](assets/): a `wrangler.toml.template` and `deplo
 
 ## Install
 
+### Claude Code plugin (auto-updates)
+
+Install as a plugin for automatic updates when the skill changes:
+
+```
+/plugin marketplace add boxabirds/cloudflare-basic-infra-starter-skill
+/plugin install cf-starter@cloudflare-basic-infra-starter-skill
+```
+
+### File-based install (all agents)
+
 Most agents scan `.agents/skills/` — clone there for the broadest coverage:
 
 ```bash
