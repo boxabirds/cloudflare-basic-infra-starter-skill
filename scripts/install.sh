@@ -15,7 +15,7 @@
 set -euo pipefail
 
 SKILL_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-SKILL_NAME="cf-starter"
+SKILL_NAME="cloudflare-basic-infra-starter"
 ALL_AGENTS="claude amp copilot cursor codex windsurf gemini cline roo"
 
 # Agent -> skills directory mapping

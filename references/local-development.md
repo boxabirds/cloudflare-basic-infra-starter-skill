@@ -22,7 +22,7 @@ npm install --save-dev wrangler @cloudflare/vitest-pool-workers vitest
 Copy the starter template and fill in your project name:
 
 ```bash
-cp /path/to/cf-starter/assets/wrangler.toml.template wrangler.toml
+cp /path/to/cloudflare-basic-infra-starter/assets/wrangler.toml.template wrangler.toml
 # Edit: replace MY_WORKER and MY_APP with your names
 ```
 

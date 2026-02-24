@@ -1,5 +1,5 @@
 ---
-name: cf-starter
+name: cloudflare-basic-infra-starter
 description: >
   USE WHEN building or scaffolding a Cloudflare Workers project.
   USE WHEN creating D1 database schemas or writing migrations.

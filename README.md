@@ -28,7 +28,7 @@ Install as a plugin for automatic updates when the skill changes:
 
 ```
 /plugin marketplace add boxabirds/cloudflare-basic-infra-starter-skill
-/plugin install cf-starter@cloudflare-basic-infra-starter-skill
+/plugin install cloudflare-basic-infra-starter@cloudflare-basic-infra-starter-skill
 ```
 
 ### File-based install (all agents)
@@ -37,19 +37,19 @@ Most agents scan `.agents/skills/` — clone there for the broadest coverage:
 
 ```bash
 git clone git@github.com:boxabirds/cloudflare-basic-infra-starter-skill.git \
-  .agents/skills/cf-starter
+  .agents/skills/cloudflare-basic-infra-starter
 ```
 
 ### Agent-specific paths
 
 | Agent | Skills path | Notes |
 |-------|-------------|-------|
-| Codex, Amp, Cline, Roo Code | `.agents/skills/cf-starter` | Universal path |
-| Cursor | `.cursor/skills/cf-starter` | Also scans `.agents/skills/` |
-| GitHub Copilot | `.github/skills/cf-starter` | Also scans `.agents/skills/` |
-| Claude Code | `.claude/skills/cf-starter` | Requires its own path |
-| Windsurf | `.windsurf/skills/cf-starter` | Requires its own path |
-| Gemini CLI | `.gemini/skills/cf-starter` | Also scans `.agents/skills/` |
+| Codex, Amp, Cline, Roo Code | `.agents/skills/cloudflare-basic-infra-starter` | Universal path |
+| Cursor | `.cursor/skills/cloudflare-basic-infra-starter` | Also scans `.agents/skills/` |
+| GitHub Copilot | `.github/skills/cloudflare-basic-infra-starter` | Also scans `.agents/skills/` |
+| Claude Code | `.claude/skills/cloudflare-basic-infra-starter` | Requires its own path |
+| Windsurf | `.windsurf/skills/cloudflare-basic-infra-starter` | Requires its own path |
+| Gemini CLI | `.gemini/skills/cloudflare-basic-infra-starter` | Also scans `.agents/skills/` |
 
 ### Install script (multi-agent symlink)
 
@@ -72,11 +72,11 @@ The skill can also be discovered through these directories:
 
 ## After Installation
 
-The skill appears in Claude Code's `/` menu as **`/cf-starter`**.
+The skill appears in Claude Code's `/` menu as **`/cloudflare-basic-infra-starter`**.
 
-**Explicit invocation**: Type `/cf-starter` to load all Cloudflare patterns into context.
+**Explicit invocation**: Type `/cloudflare-basic-infra-starter` to load all Cloudflare patterns into context.
 
-**Auto-activation**: Claude will attempt to load the skill automatically when you discuss Cloudflare Workers, D1, Wrangler, or Pages. Auto-activation is not 100% reliable -- if Claude doesn't pick it up, type `/cf-starter` explicitly.
+**Auto-activation**: Claude will attempt to load the skill automatically when you discuss Cloudflare Workers, D1, Wrangler, or Pages. Auto-activation is not 100% reliable -- if Claude doesn't pick it up, type `/cloudflare-basic-infra-starter` explicitly.
 
 **Verify installation**: Ask Claude "What skills are available?" or check the `/` menu.
 
