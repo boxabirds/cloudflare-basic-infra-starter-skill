@@ -10,7 +10,7 @@
     {
       "name": "cloudflare-basic-infra-starter",
       "description": "Proven infrastructure patterns for Cloudflare Workers + D1 + Pages projects. Worker architecture, D1 schema design, multi-env Wrangler config, deploy scripts, testing, auth, and local dev.",
-      "source": ".",
+      "source": "./",
       "category": "development"
     }
   ]
